@@ -66,7 +66,7 @@ create table
     constraint platforms_pkey primary key (platform_name)
   ) tablespace pg_default;
 
-insert into public.platforms (platform_name) values ('Facebook'),('Instagram');
+insert into public.platforms (platform_name) values ('Facebook'),('Instagram'), ('Facebook page');
   
 create table
   public.platform_account (

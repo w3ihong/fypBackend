@@ -1,5 +1,5 @@
 
-from env import app
+from app.config import app
 
 
 
