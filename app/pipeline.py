@@ -1,5 +1,5 @@
 from config import supabase
-from account import Account
+from account import Platform_Account
 import json
 
 def fetch_data():
@@ -14,11 +14,18 @@ def load_data():
 
 
 def main():
-    allAccounts = supabase.table('platform_account').select("*").execute()
+
+    # updates posts table for all accounts
+    allAccounts = supabase.table('platform_account').select("platform_account_id,access_token").execute()
     for account in allAccounts.data:
-        account = Account(account["platform_account_id"], None)
-        print(account)
+        if account["access_token"] == None:
+            continue
+        a1 = Platform_Account(account["platform_account_id"], account["access_token"])
+        a1.updatePostsTable()
         
+    # ETL for all posts
+
+    
         
 
 main()  

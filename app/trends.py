@@ -3,6 +3,7 @@ from config import supabase
 import json
 from pytrends.request import TrendReq
 import pandas as pd
+from nltk.corpus import wordnet
 
 pytrends  = TrendReq(hl='en-US', tz=360)
 
@@ -59,12 +60,11 @@ def main():
 
 
 if __name__ == "__main__":
-    from nltk.corpus import wordnet
 
-# Get synsets for a word
-synsets = wordnet.synsets('dog')
+    # Get synsets for a word
+    synsets = wordnet.synsets('dog')
 
-# Get definitions and examples
-for synset in synsets:
-    print(synset.definition())
-    print(synset.examples())
+    # Get definitions and examples
+    for synset in synsets:
+        print(synset.definition())
+        print(synset.examples())

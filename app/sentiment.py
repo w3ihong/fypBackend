@@ -22,7 +22,7 @@ def main():
                 'this shit is awfull',
                 'what a great day today',
                 'what a boring day',
-                'fyp sucks'
+                'fuck fyp'
                 ]
     for teststr in teststrs:
         getVaderSentiment(teststr)
