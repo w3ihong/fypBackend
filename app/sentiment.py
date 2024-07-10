@@ -21,8 +21,7 @@ def main():
                 'this aint polished at all but it works',
                 'this shit is awfull',
                 'what a great day today',
-                'what a boring day',
-                'fuck fyp'
+                'what a boring day'
                 ]
     for teststr in teststrs:
         getVaderSentiment(teststr)

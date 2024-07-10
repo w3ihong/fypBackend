@@ -40,62 +40,6 @@ class Platform_Account:
         mediaList = [int(item['id']) for item in x["data"]]
         return mediaList
     
-    def updatePostsTable(self):
-
-        # get existing posts from posts table
-        oldList = self.getPosts()
-
-        # get new posts from IG
-        newList = self.getIGMediaObjects()
-        
-        # compare with mediaList
-        toUpdateInsert, toDelete = self.processLists(oldList, newList)
-
-        if len(toUpdateInsert) == 0 and len(toDelete) == 0:
-            print("No new posts to update or delete")
-            return 
-        
-        else:
-            # delete old posts
-            updateSuccess = 0
-            deleteSuccess = 0
-
-            for postID in toDelete:
-                try:
-                    response = supabase.table('posts').delete().eq('id', postID).execute()
-                     
-                except:
-                    print("Error deleting post: ", postID)
-                    continue
-                deleteSuccess += 1
-                
-            # insert new posts
-            for postID in toUpdateInsert:
-                post = self.getMediaMetadata(postID)
-                try:
-                    response = supabase.table('posts').insert([{
-                        'id': postID,
-                        'platform_account': self.platformAccID,
-                        'created_at' : post['timestamp'],
-                        'post_type': post['media_type'],
-                        'caption': post['caption'],
-                        'media_url': post['media_url'],
-                        'permalink':post['permalink']
-
-                    }]).execute()
-
-                except:
-                    print("Error inserting post: ", postID)
-                    continue
-                
-                updateSuccess += 1
-
-            print ("user: ", self.platformAccID)
-            print ("delete Success: ", deleteSuccess, "/", len(toDelete))
-            print ("update Success: ", updateSuccess, "/", len(toUpdateInsert))
-
-            return 
-
     def getPosts(self):
         existingPosts = supabase.table('posts').select('id').eq('platform_account', self.platformAccID).execute()
         itemList = [item['id'] for item in existingPosts.data]
@@ -133,31 +77,55 @@ class Platform_Account:
         return toUpdateInsert, toDelete
     
     def getMediaInsights(self,mediaID):
-            endpoint = f'https://graph.facebook.com/v20.0/{mediaID}/insights'
-            params = {
-                'fields': 'engagement,impressions,reach,saved',
-                'access_token': self.accessToken
-            }
+        endpoint = f'https://graph.facebook.com/v20.0/{mediaID}/insights'
+        params = {
+            'metric': 'likes,shares,saved,comments,impressions,reach,profile_visits,video_views,total_interactions',
+            'access_token': self.accessToken
+        }
 
-            response = requests.get(endpoint, params=params)
-
-            return
+        response = requests.get(endpoint, params=params)
+        result = {item['name']: item['values'][0]['value'] for item in (response.json())['data']}
+        print(result)
+        return result
     
+    def getMediaSentiment(self,mediaID):
+        endpoint = f'https://graph.facebook.com/v20.0/{mediaID}/comments?access_token={self.accessToken}'
+        
+        response = requests.get(endpoint)
+        texts = [item['text'] for item in (response.json())['data']]
+
+        sentimentScore = 0
+        # Printing the result
+        for text in texts:
+            score = sentiment.getBlobSentiment(text)
+            sentimentScore += score
+
+        return sentimentScore/len(texts)
+        
     
 def main():
 
     ACCESS_TOKEN = 'EAAenAlDWmIUBO3k0yBJbAWTW615hbJnqAWjkz6idP6ZBfVPSa3EMylPbbfcsEbqwk2s21uIHpHoEKPO1ZAyMyrnaiu6Js0ZCvDxjE4PZCvAtS7zqqcw9z7A6XRJDNgIda3cutLO6VAIZAnSxrlxHhQ301n4z2mgAT4d5VVaMxtomWQV93B75tjjAWzGY46k7H'
     APP_ID = '17841466917978018'
+
+    newList = [17963029475773994, 17919006197946852, 17940105560831903, 18150262132315832, 17976896420565504, 18060744193576295, 18012362903177861, 17959705052772586]
     
+    postID = 18012362903177861
+
     a1 = Platform_Account(APP_ID, ACCESS_TOKEN)
     # oldList = a1.getPosts()
     # print ("old list")
     # print(oldList)
     # newList = a1.getIGMediaObjects()
-    # print("new list")
     # print(newList)
-    # l1, l2 = a1.processLists(oldList, newList)
-    a1.updatePostsTable()
+
+    # score = a1.getMediaSentiment(postID)
+
+    i1 = a1.getMediaInsights(postID)
+    # print(i1)
+
+    # for i in newList:
+    #     a1.getMediaInsights(i)
 
 
 

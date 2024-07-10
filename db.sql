@@ -103,7 +103,7 @@ CREATE TABLE public.platform_metrics (
     platform_virality_rate numeric GENERATED ALWAYS AS (platform_shares::numeric / NULLIF(platform_impressions, 0)) STORED,
     platform_amplification_rate numeric GENERATED ALWAYS AS (platform_shares::numeric / NULLIF(platform_followers, 0)) STORED,
     platform_engagement_rate numeric GENERATED ALWAYS AS ((platform_likes + platform_shares + platform_comments)::numeric / NULLIF(platform_followers, 0)) STORED,
-    platform_sentiment smallint,          -- auto generated, you do not need to fill this column
+    platform_sentiment float,          -- auto generated, you do not need to fill this column
     date_retrieved timestamp DEFAULT now(),
     CONSTRAINT platform_metrics_platform_account_fkey FOREIGN KEY (platform_account) REFERENCES platform_account (platform_account_id)
 ) TABLESPACE pg_default;
@@ -111,26 +111,19 @@ CREATE TABLE public.platform_metrics (
 CREATE TABLE public.post_metrics (
     post_metric_id SERIAL PRIMARY KEY,  -- auto generated, you do not need to fill this column
     post_id bigint,
-    platform_account bigint,
-    post_type character varying(20),
     post_likes integer,
     post_shares integer,
     post_saved integer,
     post_comments integer,
     post_impressions integer,
     post_reach integer,
-    post_profile_views integer,
+    post_profile_visits integer,
     post_virality_rate numeric GENERATED ALWAYS AS (post_shares::numeric / NULLIF(post_impressions, 0)) STORED,
     post_amplification_rate numeric,    -- auto generated, you do not need to fill this column
     post_engagement_rate numeric GENERATED ALWAYS AS ((post_likes + post_shares + post_comments)::numeric / NULLIF(post_reach, 0)) STORED,
-    post_sentiment smallint,
-    date_retrieved timestamp DEFAULT now(),
-    CONSTRAINT post_metrics_platform_account_fkey FOREIGN KEY (platform_account) REFERENCES platform_account (platform_account_id)
+    post_sentiment float,
+    date_retrieved timestamp DEFAULT now()
 ) TABLESPACE pg_default;
-
--- team table
--- drafts table
-
 
 
 -- function to update the post_amplification_rate column in the post_metrics table
