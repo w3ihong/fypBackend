@@ -1,4 +1,5 @@
 import os
+import time
 from supabase import create_client, Client
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -24,4 +25,6 @@ supabase: Client = create_client(url, key)
 
 APP_ID = os.getenv("APP_ID")
 APP_SECRET = os.getenv("APP_SECRET")
+
+NOW = int(time.time())
  
