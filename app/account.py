@@ -82,8 +82,6 @@ class Platform_Account:
             if itemID not in newSet:
                 toDelete.append(itemID)
 
-        print("toUpdateInsert: ", toUpdateInsert)
-        print("toDelete: ", toDelete)
         return toUpdateInsert, toDelete
     
 
@@ -128,40 +126,6 @@ class Platform_Account:
     
     def getReachDemographics(self):
         return
-    
-def etlInsights(post,a1: Platform_Account, mediaType, followers):
-
-    print("post: ", post , " mediaType: ", mediaType)
-    insights = a1.getMediaInsights(post, mediaType)
-    if insights['comments'] != 0:
-        sentimentScore = a1.getMediaSentiment(post)
-    else:
-        sentimentScore = 0
-    try:
-        # response = supabase.table('post_metrics').insert([{
-        #     'post_id': post,
-        #     'post_likes': insights['likes'],
-        #     'post_shares': insights['shares'],
-        #     'post_saved': insights['saved'],
-        #     'post_comments': insights['comments'],
-        #     'post_impressions': insights['impressions'],
-        #     'post_reach': insights['reach'],
-        #     'post_profile_visits': insights['profile_visits'] if mediaType != 'VIDEO' else 0,
-        #     'post_sentiment': sentimentScore,
-        #     'post_video_views': insights['video_views'],
-        #     'post_amplification_rate' : insights['shares']/followers
-        # }]).execute()
-        # print("response: ", response)
-        print("SUCCESS for : ", post)
-    except Exception as e:
-        print("FAILED for : ", post)
-        print(e)
-        return False
-    
-    fullMetrics = {"id": post , "likes":insights["likes"], "shares": insights['shares'], "saved": insights["saved"], "comments": insights["comments"], "impressions": insights["impressions"], "reach" : insights["reach"], "profile_visits" : insights['profile_visits'] if mediaType != 'VIDEO' else 0, "sentiment" : sentimentScore, "video_views" : insights['video_views'], "amplification_rate":insights['shares']/followers }
-
-    return True, fullMetrics
-
 
 def main():
 
@@ -186,9 +150,6 @@ def main():
 
     month3 = NOW - 3*UNIX_MONTH
    
-    success,fullMetrics = etlInsights(postID, a1, a1.getMediaType(postID), 115)
-    if success:
-        print(fullMetrics)
     
     # i1 = a1.getAccountInsights(since = month, period = 'day')
     # print(i1)

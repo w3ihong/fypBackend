@@ -5,11 +5,9 @@ def updatePostsTable(self : Platform_Account) -> list:
 
     # get existing posts from posts table
     oldList = self.getPosts()
-    print("OLD : ", oldList)
 
     # get new posts from IG
     newList = self.getIGMediaObjects()
-    print("NEW : " , newList)
     NEWwithMedia = {}
     # compare with mediaList
     toUpdateInsert, toDelete = self.processLists(oldList, newList)
@@ -55,9 +53,11 @@ def updatePostsTable(self : Platform_Account) -> list:
             
             updateSuccess += 1
 
-        print ("user: ", self.platformAccID)
-        print ("delete Success: ", deleteSuccess, "/", len(toDelete))
-        print ("update Success: ", updateSuccess, "/", len(toUpdateInsert))
+        print ("USER: ", self.platformAccID)
+        print ("MediaList: ", NEWwithMedia)
+        print ("Update Success: ", updateSuccess, "/", len(toUpdateInsert))
+        print ("Delete Success: ", deleteSuccess, "/", len(toDelete))
+        print (" ")
         
         return NEWwithMedia
 
@@ -84,6 +84,7 @@ def updatePostMetrics(post,a1: Platform_Account, mediaType, followers):
             'post_amplification_rate' : insights['shares']/followers
         }]).execute()
         print("SUCCESS for : ", post)
+        print( " ")
     except Exception as e:
         print("FAILED for : ", post)
         print(e)
@@ -110,6 +111,7 @@ def updateAccountMetrics(metrics, postCount, a1: Platform_Account):
             # reach cannot be derieved 
 
         }]).execute()
+        print("Account metrics Success for :", a1.platformAccID)
     except Exception as e:
         print( "Account metrics Failed for :", a1.platformAccID)
         print (e)
@@ -129,7 +131,7 @@ def main():
         mediaList = updatePostsTable(a1)
         followers = a1.getAccountFollwers()
         postUpdateSuccess = 0
-        accountMetrics = {"likes": 0 , "shares": 0 , "saved": 0, "comments": 0 , "impressions": 0, "profile_visits" : 0, "sentiment" : 0, "video_views" : 0 , "sentiment" : 0, "followers" : followers}
+        accountMetrics = {"video_views" : 0, "likes": 0 , "shares": 0 , "saved": 0, "comments": 0 , "impressions": 0, "profile_visits" : 0, "sentiment" : 0 , "sentiment" : 0, "followers" : followers}
         
         for post in mediaList:
             type = mediaList[post]
@@ -144,13 +146,13 @@ def main():
                 accountMetrics['sentiment'] += fullPostMetrics['sentiment']
                 accountMetrics['video_views'] += fullPostMetrics['video_views']
 
-                print("accountMetrics ", accountMetrics)
                 postUpdateSuccess += 1
         
 
         print("update Success: ", postUpdateSuccess, "/", len(mediaList))
         
         accountMetricsUpdate = updateAccountMetrics(accountMetrics, len(mediaList), a1)
+        print("Full Account Metrics ", accountMetrics)
         if accountMetricsUpdate:
             accountUpdateSuccess += 1
     print("account update Success: ", accountUpdateSuccess, "/", len(allAccounts.data))
