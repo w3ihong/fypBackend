@@ -92,7 +92,7 @@ CREATE TABLE public.platform_followers_demographic_ (
 CREATE TABLE public.platform_metrics (
     platform_metrics_id serial PRIMARY KEY, -- auto generated, you do not need to fill this column
     platform_account bigint,
-    platform_account_views integer,
+    platform_profile_visits integer,
     platform_followers integer,
     platform_likes bigint,
     platform_comments integer,
@@ -107,6 +107,8 @@ CREATE TABLE public.platform_metrics (
     date_retrieved timestamp DEFAULT now(),
     CONSTRAINT platform_metrics_platform_account_fkey FOREIGN KEY (platform_account) REFERENCES platform_account (platform_account_id)
 ) TABLESPACE pg_default;
+
+
 
 CREATE TABLE public.post_metrics (
     post_metric_id SERIAL PRIMARY KEY,  -- auto generated, you do not need to fill this column

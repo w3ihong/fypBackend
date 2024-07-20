@@ -5,15 +5,17 @@ import time
 from config import supabase
 from config import APP_ID
 from config import NOW
+from config import UNIX_MONTH
+from config import UNIX_WEEK
 
 class Platform_Account:
 
-    def __init__(self, platformAccID, accessToken) -> None:
+    def __init__(self, platformAccID, accessToken, username) -> None:
         # if accessToken == None:
         #     accessToken = self.getAccountAccesstoken()
         self.accessToken = accessToken
         self.platformAccID = platformAccID
-
+        self.username = username
 
     def getAccountPages(self) -> str:
         
@@ -55,7 +57,7 @@ class Platform_Account:
         }
 
         response = requests.get(endpoint, params=params)
-        return response.json()
+        return response.json(), self.getMediaType(mediaID)
     
     def getMediaType(self,mediaID):
         endpoint = f'https://graph.facebook.com/v20.0/{mediaID}'
@@ -71,13 +73,9 @@ class Platform_Account:
         oldSet = set(oldList)
         newSet = set(newList)
 
-        toUpdateInsert = []
+        toUpdateInsert = newSet
         toDelete = []
 
-        # Find items to update or insert
-        for itemID in newSet:
-            if itemID not in oldSet:
-                toUpdateInsert.append(itemID)
 
         # Find items to delete
         for itemID in oldSet:
@@ -97,9 +95,7 @@ class Platform_Account:
         
         endpoint = f'https://graph.facebook.com/v20.0/{mediaID}/insights?metric={metrics}&access_token={self.accessToken}'
         
-
         response = requests.get(endpoint)
-        print (response.json())
         result = {item['name']: item['values'][0]['value'] for item in (response.json())['data']}
         print(result)
         return result
@@ -117,22 +113,11 @@ class Platform_Account:
             sentimentScore += score
 
         return sentimentScore/len(texts)
-        
     
-    def getAccountInsights(self, since, until = NOW, period : str = 'day'):
-
-        # followerEndpoint = f'https://graph.facebook.com/v20.0/{self.platformAccID}/insights?metric=follower_count&period={period}&since={since}&until={until}&access_token={self.accessToken}'
-
-        metric = "impressions,reach,profile_views,total_interactions,accounts_engaged,likes,comments,saves,shares"
-        if since == None:
-            endpoint = f'https://graph.facebook.com/v20.0/{self.platformAccID}/insights?metric={metric}&period={period}&metric_type=total_value&access_token={self.accessToken}'
-        else:
-            endpoint = f'https://graph.facebook.com/v20.0/{self.platformAccID}/insights?metric={metric}&period={period}&metric_type=total_value&since={since}&until={until}&access_token={self.accessToken}'
-
+    def getAccountFollwers(self):
+        endpoint = f'https://graph.facebook.com/v20.0/{self.platformAccID}?fields=business_discovery.username({self.username}){{followers_count}}&access_token={self.accessToken}'
         response = requests.get(endpoint)
-        # response = requests.get(endpoint)
-        
-        return response.json()
+        return response.json()["business_discovery"]["followers_count"]
     
         
     def getFollowerDemographics(self):
@@ -143,19 +128,52 @@ class Platform_Account:
     
     def getReachDemographics(self):
         return
+    
+def etlInsights(post,a1: Platform_Account, mediaType, followers):
 
+    print("post: ", post , " mediaType: ", mediaType)
+    insights = a1.getMediaInsights(post, mediaType)
+    if insights['comments'] != 0:
+        sentimentScore = a1.getMediaSentiment(post)
+    else:
+        sentimentScore = 0
+    try:
+        # response = supabase.table('post_metrics').insert([{
+        #     'post_id': post,
+        #     'post_likes': insights['likes'],
+        #     'post_shares': insights['shares'],
+        #     'post_saved': insights['saved'],
+        #     'post_comments': insights['comments'],
+        #     'post_impressions': insights['impressions'],
+        #     'post_reach': insights['reach'],
+        #     'post_profile_visits': insights['profile_visits'] if mediaType != 'VIDEO' else 0,
+        #     'post_sentiment': sentimentScore,
+        #     'post_video_views': insights['video_views'],
+        #     'post_amplification_rate' : insights['shares']/followers
+        # }]).execute()
+        # print("response: ", response)
+        print("SUCCESS for : ", post)
+    except Exception as e:
+        print("FAILED for : ", post)
+        print(e)
+        return False
+    
+    fullMetrics = {"id": post , "likes":insights["likes"], "shares": insights['shares'], "saved": insights["saved"], "comments": insights["comments"], "impressions": insights["impressions"], "reach" : insights["reach"], "profile_visits" : insights['profile_visits'] if mediaType != 'VIDEO' else 0, "sentiment" : sentimentScore, "video_views" : insights['video_views'], "amplification_rate":insights['shares']/followers }
+
+    return True, fullMetrics
 
 
 def main():
 
     ACCESS_TOKEN = 'EAAenAlDWmIUBO3k0yBJbAWTW615hbJnqAWjkz6idP6ZBfVPSa3EMylPbbfcsEbqwk2s21uIHpHoEKPO1ZAyMyrnaiu6Js0ZCvDxjE4PZCvAtS7zqqcw9z7A6XRJDNgIda3cutLO6VAIZAnSxrlxHhQ301n4z2mgAT4d5VVaMxtomWQV93B75tjjAWzGY46k7H'
     APP_ID = '17841466917978018'
-
+    USERNAME = 'echosphere.sg'
+    
     newList = [17963029475773994, 17919006197946852, 17940105560831903, 18150262132315832, 17976896420565504, 18060744193576295, 18012362903177861, 17959705052772586]
     
     postID = 18012362903177861
 
-    a1 = Platform_Account(APP_ID, ACCESS_TOKEN)
+    a1 = Platform_Account(APP_ID, ACCESS_TOKEN, USERNAME)
     # oldList = a1.getPosts()
     # print ("old list")
     # print(oldList)
@@ -164,8 +182,16 @@ def main():
 
     # score = a1.getMediaSentiment(postID)
 
-    i1 = a1.getAccountInsights(None, None, 'day')
-    print(i1)
+    month = NOW - 2592000
+
+    month3 = NOW - 3*UNIX_MONTH
+   
+    success,fullMetrics = etlInsights(postID, a1, a1.getMediaType(postID), 115)
+    if success:
+        print(fullMetrics)
+    
+    # i1 = a1.getAccountInsights(since = month, period = 'day')
+    # print(i1)
 
     # for i in newList:
     #     a1.getMediaInsights(i)

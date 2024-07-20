@@ -16,13 +16,7 @@ def getBlobSentiment(sentence):
 
 
 def main():
-    teststrs = ['sheesh echosphere is a great product',
-                'this thing could use a little more work',
-                'this aint polished at all but it works',
-                'this shit is awfull',
-                'what a great day today',
-                'what a boring day'
-                ]
+    teststrs = ['This is not useful']
     for teststr in teststrs:
         getVaderSentiment(teststr)
         getBlobSentiment(teststr)

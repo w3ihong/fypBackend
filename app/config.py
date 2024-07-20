@@ -27,4 +27,7 @@ APP_ID = os.getenv("APP_ID")
 APP_SECRET = os.getenv("APP_SECRET")
 
 NOW = int(time.time())
+
+UNIX_WEEK = 604800
+UNIX_MONTH = 2629743
  
