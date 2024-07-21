@@ -1,24 +1,12 @@
 import os
 import time
 from supabase import create_client, Client
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
 load_dotenv("./.env.local")
 
-#Fast API init
-app = FastAPI()
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:3000", "https://fyp-flame.vercel.app"],  # Frontend URL
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
-# supabase client ini
-
+# supabase client init
 url: str = os.getenv('SUPABASE_URL')
 key: str = os.getenv('SUPABASE_KEY')
 supabase: Client = create_client(url, key)
@@ -30,4 +18,5 @@ NOW = int(time.time())
 
 UNIX_WEEK = 604800
 UNIX_MONTH = 2629743
+FB_MONTH = 2592000
  

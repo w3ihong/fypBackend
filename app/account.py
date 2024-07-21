@@ -1,12 +1,7 @@
-import sentiment
+from .sentiment import getBlobSentiment
 import json
 import requests
-import time
-from config import supabase
-from config import APP_ID
-from config import NOW
-from config import UNIX_MONTH
-from config import UNIX_WEEK
+from .config import supabase
 
 class Platform_Account:
 
@@ -107,12 +102,12 @@ class Platform_Account:
         sentimentScore = 0
         # Printing the result
         for text in texts:
-            score = sentiment.getBlobSentiment(text)
+            score = getBlobSentiment(text)
             sentimentScore += score
 
         return sentimentScore/len(texts)
     
-    def getAccountFollwers(self):
+    def getAccountFollowers(self):
         endpoint = f'https://graph.facebook.com/v20.0/{self.platformAccID}?fields=business_discovery.username({self.username}){{followers_count}}&access_token={self.accessToken}'
         response = requests.get(endpoint)
         return response.json()["business_discovery"]["followers_count"]
@@ -146,11 +141,6 @@ def main():
 
     # score = a1.getMediaSentiment(postID)
 
-    month = NOW - 2592000
-
-    month3 = NOW - 3*UNIX_MONTH
-   
-    
     # i1 = a1.getAccountInsights(since = month, period = 'day')
     # print(i1)
 

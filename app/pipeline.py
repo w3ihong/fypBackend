@@ -1,5 +1,5 @@
-from config import supabase
-from account import Platform_Account
+from .config import supabase
+from .account import Platform_Account
 
 def updatePostsTable(self : Platform_Account) -> list:
 
@@ -94,7 +94,6 @@ def updatePostMetrics(post,a1: Platform_Account, mediaType, followers):
 
     return True, fullMetrics
 
-
 def updateAccountMetrics(metrics, postCount, a1: Platform_Account):
     metrics["sentiment"] = metrics["sentiment"]/postCount
     try:
@@ -119,6 +118,40 @@ def updateAccountMetrics(metrics, postCount, a1: Platform_Account):
     
     return True
 
+def singleAccountOnboard(id, access_token, username):
+    # account = supabase.table('platform_account').select("access_token,account_username").eq('platform_account_id', id).execute()
+    # access_token = account.data[0]["access_token"]
+    # username = account.data[0]["account_username"]
+    print ("Onboarding Account: ", id)
+    a1 = Platform_Account(id, access_token, username)
+    mediaList = updatePostsTable(a1)
+    followers = a1.getAccountFollowers()
+    postUpdateSuccess = 0
+    accountMetrics = {"video_views" : 0, "likes": 0 , "shares": 0 , "saved": 0, "comments": 0 , "impressions": 0, "profile_visits" : 0, "sentiment" : 0 , "sentiment" : 0, "followers" : followers}
+    
+    for post in mediaList:
+        type = mediaList[post]
+        insightsETLSuccess, fullPostMetrics = updatePostMetrics(post,a1,type,followers)
+        if insightsETLSuccess:
+            accountMetrics['likes'] += fullPostMetrics['likes']
+            accountMetrics['shares'] += fullPostMetrics['shares']
+            accountMetrics['saved'] += fullPostMetrics['saved']
+            accountMetrics['comments'] += fullPostMetrics['comments']
+            accountMetrics['impressions'] += fullPostMetrics['impressions']
+            accountMetrics['profile_visits'] += fullPostMetrics['profile_visits']
+            accountMetrics['sentiment'] += fullPostMetrics['sentiment']
+            accountMetrics['video_views'] += fullPostMetrics['video_views']
+
+            postUpdateSuccess += 1
+    
+
+    print("update Success: ", postUpdateSuccess, "/", len(mediaList))
+    
+    accountMetricsUpdate = updateAccountMetrics(accountMetrics, len(mediaList), a1)
+    print("Full Account Metrics ", accountMetrics)
+    if accountMetricsUpdate:
+        return True
+    return False
 
 def main():
     # updates posts table for all accounts
@@ -129,7 +162,7 @@ def main():
             continue
         a1 = Platform_Account(account["platform_account_id"], account["access_token"], account["account_username"])
         mediaList = updatePostsTable(a1)
-        followers = a1.getAccountFollwers()
+        followers = a1.getAccountFollowers()
         postUpdateSuccess = 0
         accountMetrics = {"video_views" : 0, "likes": 0 , "shares": 0 , "saved": 0, "comments": 0 , "impressions": 0, "profile_visits" : 0, "sentiment" : 0 , "sentiment" : 0, "followers" : followers}
         
@@ -147,7 +180,6 @@ def main():
                 accountMetrics['video_views'] += fullPostMetrics['video_views']
 
                 postUpdateSuccess += 1
-        
 
         print("update Success: ", postUpdateSuccess, "/", len(mediaList))
         
@@ -159,4 +191,4 @@ def main():
     
 
 if __name__ == "__main__":
-    main()
+    print(singleAccountOnboard(17841466917978018))

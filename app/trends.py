@@ -1,5 +1,5 @@
  
-from config import supabase
+from .config import supabase
 import json
 from pytrends.request import TrendReq
 import pandas as pd
