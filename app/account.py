@@ -1,7 +1,9 @@
-from .sentiment import getBlobSentiment
 import json
 import requests
-from .config import supabase
+# from .sentiment import getBlobSentiment
+# from .config import supabase
+from sentiment import getBlobSentiment
+from config import supabase
 
 class Platform_Account:
 
@@ -114,6 +116,11 @@ class Platform_Account:
     
         
     def getFollowerDemographics(self):
+        endpoint = f'https://graph.facebook.com/v20.0/{self.platformAccID}/insights?metric=follower_demographics&period=lifetime&metric_type=total_value&breakdown=age,city,country,gender&access_token={self.accessToken}'
+        print (endpoint)
+        response = requests.get(endpoint)
+        
+        print (response.json())
         return 
     
     def getEngagedDemographics(self):
@@ -124,7 +131,7 @@ class Platform_Account:
 
 def main():
 
-    ACCESS_TOKEN = 'EAAenAlDWmIUBO3k0yBJbAWTW615hbJnqAWjkz6idP6ZBfVPSa3EMylPbbfcsEbqwk2s21uIHpHoEKPO1ZAyMyrnaiu6Js0ZCvDxjE4PZCvAtS7zqqcw9z7A6XRJDNgIda3cutLO6VAIZAnSxrlxHhQ301n4z2mgAT4d5VVaMxtomWQV93B75tjjAWzGY46k7H'
+    ACCESS_TOKEN = 'EAAenAlDWmIUBOw8If8twNUWZAu1oUT6mxwQrFoMMRrHXoKuYhd6OZCfXL9ZCftV5YisEZBeGebjpneqCjx9FU2XJJ6fGPvc5UDrnXZC9jwmxX2iX4iNZAUbGtZBlpddet0bK3toCWHncyn2HrSCLe0XSIHToyQaYlWvLNSo0ucfP4DHirlVKr2f9whV69QqSRa3'
     APP_ID = '17841466917978018'
     USERNAME = 'echosphere.sg'
     
@@ -133,19 +140,7 @@ def main():
     postID = 18012362903177861
 
     a1 = Platform_Account(APP_ID, ACCESS_TOKEN, USERNAME)
-    # oldList = a1.getPosts()
-    # print ("old list")
-    # print(oldList)
-    # newList = a1.getIGMediaObjects()
-    # print(newList)
-
-    # score = a1.getMediaSentiment(postID)
-
-    # i1 = a1.getAccountInsights(since = month, period = 'day')
-    # print(i1)
-
-    # for i in newList:
-    #     a1.getMediaInsights(i)
+    # a1.getFollowerDemographics()
 
 
 
