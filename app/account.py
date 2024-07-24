@@ -143,7 +143,7 @@ class Platform_Account:
     
         
     
-    def getReachedDemographics(self,type,timeframe):
+    def getDemographics(self,type,timeframe):
         demographic = {}
         ageEndpoint = f'https://graph.facebook.com/v20.0/{self.platformAccID}/insights?metric={type}_audience_demographics&timeframe={timeframe}&period=lifetime&metric_type=total_value&breakdown=age&access_token={self.accessToken}'
         genderEndpoint = f'https://graph.facebook.com/v20.0/{self.platformAccID}/insights?metric={type}_audience_demographics&timeframe={timeframe}&period=lifetime&metric_type=total_value&breakdown=gender&access_token={self.accessToken}'
@@ -191,7 +191,7 @@ def main():
     postID = 18012362903177861
 
     a1 = Platform_Account(APP_ID, ACCESS_TOKEN, USERNAME)
-    a1.getReachedDemographics("this_month")
+    a1.getDemographics("this_month")
 
 
 

@@ -1,5 +1,8 @@
 from .config import supabase
 from .account import Platform_Account
+# from config import supabase
+# from account import Platform_Account
+
 
 def updatePostsTable(self : Platform_Account) -> list:
 
@@ -162,7 +165,7 @@ def updateDemographics(a1 :Platform_Account):
             'city' : followerDemo['city'],
             'country' : followerDemo['country'],
             'gender' : followerDemo['gender']
-        }])
+        }]).execute()
     except Exception as e:
         print("Demographics update failed for: ", a1.platformAccID)
         print(e)
@@ -219,4 +222,9 @@ def main():
     
 
 if __name__ == "__main__":
-    print(singleAccountOnboard(17841466917978018))
+    ACCESS_TOKEN = 'EAAenAlDWmIUBOw8If8twNUWZAu1oUT6mxwQrFoMMRrHXoKuYhd6OZCfXL9ZCftV5YisEZBeGebjpneqCjx9FU2XJJ6fGPvc5UDrnXZC9jwmxX2iX4iNZAUbGtZBlpddet0bK3toCWHncyn2HrSCLe0XSIHToyQaYlWvLNSo0ucfP4DHirlVKr2f9whV69QqSRa3'
+    APP_ID = '17841466917978018'
+    USERNAME = 'echosphere.sg'
+
+    a1 = Platform_Account(APP_ID,ACCESS_TOKEN,USERNAME)
+    updateDemographics(a1)

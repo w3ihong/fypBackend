@@ -42,7 +42,7 @@ def retrieveDemographicsData(id,type,timeframe):
     access_token = account.data[0]["access_token"]
     username = account.data[0]["account_username"]
     a1 = Platform_Account(id,access_token,username)
-    return a1.getDemographicsData(type,timeframe)
+    return a1.getDemographics(type,timeframe)
     
 @app.get("/trends/")
 def retrieveTrends():
