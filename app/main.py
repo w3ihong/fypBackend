@@ -5,6 +5,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from .pipeline import singleAccountOnboard 
 from .pipeline import main as pipelineMain
 from .config import supabase
+from .account import Platform_Account
+
 
 #Fast API init
 app = FastAPI()
@@ -33,3 +35,15 @@ def pipeline():
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
+
+@app.get("/demographics/{id}/{type}/{timeframe}")
+def retrieveDemographicsData(id,type,timeframe):
+    account = supabase.table('platform_account').select("access_token,account_username").eq('platform_account_id', id).execute()
+    access_token = account.data[0]["access_token"]
+    username = account.data[0]["account_username"]
+    a1 = Platform_Account(id,access_token,username)
+    return a1.getDemographicsData(type,timeframe)
+    
+@app.get("/trends/")
+def retrieveTrends():
+    return 

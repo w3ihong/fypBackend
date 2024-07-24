@@ -153,6 +153,23 @@ def singleAccountOnboard(id, access_token, username):
         return True
     return False
 
+def updateDemographics(a1 :Platform_Account):
+    followerDemo = a1.getFollowerDemographics()
+    try:
+        response = supabase.table('follower_demographics').insert([{    
+            'platform_account' : a1.platformAccID,
+            'age' : followerDemo['age'],
+            'city' : followerDemo['city'],
+            'country' : followerDemo['country'],
+            'gender' : followerDemo['gender']
+        }])
+    except Exception as e:
+        print("Demographics update failed for: ", a1.platformAccID)
+        print(e)
+        return False
+
+    return True
+
 def main():
     # updates posts table for all accounts
     allAccounts = supabase.table('platform_account').select("platform_account_id,access_token,account_username").execute()
@@ -181,13 +198,24 @@ def main():
 
                 postUpdateSuccess += 1
 
-        print("update Success: ", postUpdateSuccess, "/", len(mediaList))
-        
+        print("Post update Success: ", postUpdateSuccess, "/", len(mediaList))
+
+        # demographics update here
+        result = updateDemographics(a1)
+        if result:
+            print("Demographics update Success")
+        else:
+            print("Demographics update Failed")
+
         accountMetricsUpdate = updateAccountMetrics(accountMetrics, len(mediaList), a1)
-        print("Full Account Metrics ", accountMetrics)
+        
         if accountMetricsUpdate:
+            print ("Account metrics Success")
             accountUpdateSuccess += 1
-    print("account update Success: ", accountUpdateSuccess, "/", len(allAccounts.data))
+        else:
+            print ("Account metrics Failed")
+
+    print("Account update Success: ", accountUpdateSuccess, "/", len(allAccounts.data))
     
 
 if __name__ == "__main__":

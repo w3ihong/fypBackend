@@ -116,18 +116,69 @@ class Platform_Account:
     
         
     def getFollowerDemographics(self):
-        endpoint = f'https://graph.facebook.com/v20.0/{self.platformAccID}/insights?metric=follower_demographics&period=lifetime&metric_type=total_value&breakdown=age,city,country,gender&access_token={self.accessToken}'
-        print (endpoint)
-        response = requests.get(endpoint)
+        followersDemographic = {}
+        ageEndpoint = f'https://graph.facebook.com/v20.0/{self.platformAccID}/insights?metric=follower_demographics&period=lifetime&metric_type=total_value&breakdown=age&access_token={self.accessToken}'
+        genderEndpoint = f'https://graph.facebook.com/v20.0/{self.platformAccID}/insights?metric=follower_demographics&period=lifetime&metric_type=total_value&breakdown=gender&access_token={self.accessToken}'
+        cityEndpoint = f'https://graph.facebook.com/v20.0/{self.platformAccID}/insights?metric=follower_demographics&period=lifetime&metric_type=total_value&breakdown=city&access_token={self.accessToken}'
+        countryEndpoint = f'https://graph.facebook.com/v20.0/{self.platformAccID}/insights?metric=follower_demographics&period=lifetime&metric_type=total_value&breakdown=country&access_token={self.accessToken}'
         
-        print (response.json())
-        return 
+        ageResponse = requests.get(ageEndpoint)
+        genderResponse = requests.get(genderEndpoint)
+        cityResponse = requests.get(cityEndpoint)
+        countryResponse = requests.get(countryEndpoint)
+        
+        ageData = extract_key_value_pairs(ageResponse.json())
+        genderData = extract_key_value_pairs(genderResponse.json())
+        cityData = extract_key_value_pairs(cityResponse.json())
+        countryData = extract_key_value_pairs(countryResponse.json())
+
+        followersDemographic['age'] = ageData
+        followersDemographic['gender'] = genderData
+        followersDemographic['city'] = cityData
+        followersDemographic['country'] = countryData
+
+        print (followersDemographic)
+
+        return followersDemographic
     
-    def getEngagedDemographics(self):
-        return
+        
     
-    def getReachDemographics(self):
-        return
+    def getReachedDemographics(self,type,timeframe):
+        demographic = {}
+        ageEndpoint = f'https://graph.facebook.com/v20.0/{self.platformAccID}/insights?metric={type}_audience_demographics&timeframe={timeframe}&period=lifetime&metric_type=total_value&breakdown=age&access_token={self.accessToken}'
+        genderEndpoint = f'https://graph.facebook.com/v20.0/{self.platformAccID}/insights?metric={type}_audience_demographics&timeframe={timeframe}&period=lifetime&metric_type=total_value&breakdown=gender&access_token={self.accessToken}'
+        cityEndpoint = f'https://graph.facebook.com/v20.0/{self.platformAccID}/insights?metric={type}_audience_demographics&timeframe={timeframe}&period=lifetime&metric_type=total_value&breakdown=city&access_token={self.accessToken}'
+        countryEndpoint = f'https://graph.facebook.com/v20.0/{self.platformAccID}/insights?metric={type}_audience_demographics&timeframe={timeframe}&period=lifetime&metric_type=total_value&breakdown=country&access_token={self.accessToken}'
+        
+        ageResponse = requests.get(ageEndpoint)
+        genderResponse = requests.get(genderEndpoint)
+        cityResponse = requests.get(cityEndpoint)
+        countryResponse = requests.get(countryEndpoint)
+
+        ageData = extract_key_value_pairs(ageResponse.json())
+        genderData = extract_key_value_pairs(genderResponse.json())
+        cityData = extract_key_value_pairs(cityResponse.json())
+        countryData = extract_key_value_pairs(countryResponse.json())
+
+        demographic['age'] = ageData
+        demographic['gender'] = genderData
+        demographic['city'] = cityData
+        demographic['country'] = countryData
+
+        print (demographic)
+
+        return demographic
+    
+def extract_key_value_pairs(data):
+    key_value_pairs = {}
+    for item in data['data']:
+        if 'total_value' in item and 'breakdowns' in item['total_value']:
+            for breakdown in item['total_value']['breakdowns']:
+                for result in breakdown['results']:
+                    key = result['dimension_values'][0]
+                    value = result['value']
+                    key_value_pairs[key] = value
+    return key_value_pairs
 
 def main():
 
@@ -140,7 +191,7 @@ def main():
     postID = 18012362903177861
 
     a1 = Platform_Account(APP_ID, ACCESS_TOKEN, USERNAME)
-    # a1.getFollowerDemographics()
+    a1.getReachedDemographics("this_month")
 
 
 

@@ -13,10 +13,8 @@ security = https://developers.facebook.com/docs/facebook-login/security/#https
 ## modules ##
 
 - data extraction and loading
-    - daily? realtime (computationally intensive)?
-    - requirements
-        - scheduling function
-        - 
+    - daily
+    
     - flow
         1. get all accounts item  in db
         2. for each acc, extract all posts and check agaisnt db
@@ -32,9 +30,9 @@ security = https://developers.facebook.com/docs/facebook-login/security/#https
         - fetch trends from google trends
         - match trends with users interest 
         - find suitable hashtags
-            - 
+            
+- 
 
 ## TODO ##
-- demographics data
 - better nlp model for sentiment (emojis)
 - hosting and automating pipeline
