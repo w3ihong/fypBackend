@@ -1,11 +1,11 @@
-# Introduction #
+## Introduction ##
 This repo serves as the backend for my fyp project @https://github.com/w3ihong/FYP
 
-# DOCs #
+## DOCs ##
 api end point : https://fyp-ml-ejbkojtuia-ts.a.run.app
 
 - /run-pipeline
-    - triggers the pipelien that performs ETL from Meta's API into our database
+    - triggers the pipeline that performs ETL from Meta's API into our database
 
 - /onboard_account/{id}
     - extracts data of a new signup, including posts and metrics. Should be triggered only once, upon connecting a new instagram account.
@@ -19,8 +19,7 @@ api end point : https://fyp-ml-ejbkojtuia-ts.a.run.app
         - {type}      : type of users to extract, can be either "reached" or "engaged"
         - {timeframe} : duration, can be either "this_month" or "this_week"
 
-- /trends
-    - 
+
 ## hosting ##
 - containerized with docker and hosted on google cloud run 
 - data pipeline is triggered by gloud scheduer every day at 12 midnight SGT
