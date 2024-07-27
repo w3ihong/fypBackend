@@ -68,11 +68,14 @@ def updatePostMetrics(post,a1: Platform_Account, mediaType, followers):
 
     print("post: ", post , " mediaType: ", mediaType)
     insights = a1.getMediaInsights(post, mediaType)
+    if insights == None:
+        print("Failed to get insights for: ", post)
+        return False
     if insights['comments'] != 0:
         sentimentScore = a1.getMediaSentiment(post)
     else:
         sentimentScore = 0
-    try:
+    try:    
         response = supabase.table('post_metrics').insert([{
             'post_id': post,
             'post_likes': insights['likes'],
@@ -87,9 +90,8 @@ def updatePostMetrics(post,a1: Platform_Account, mediaType, followers):
             'post_amplification_rate' : insights['shares']/followers
         }]).execute()
         print("SUCCESS for : ", post)
-        print( " ")
     except Exception as e:
-        print("FAILED for : ", post)
+        print("Failed stroe data  for : ", post)
         print(e)
         return False
     

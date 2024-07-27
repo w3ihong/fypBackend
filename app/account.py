@@ -39,6 +39,7 @@ class Platform_Account:
         response = requests.get(endpoint)
         x = response.json()
         mediaList = [int(item['id']) for item in x["data"]]
+        print (mediaList)
         return mediaList
     
     def getPosts(self):
@@ -52,7 +53,6 @@ class Platform_Account:
             'fields': 'id,media_type,media_url,thumbnail_url,permalink,caption,timestamp',
             'access_token': self.accessToken
         }
-
         response = requests.get(endpoint, params=params)
         return response.json(), self.getMediaType(mediaID)
     
@@ -62,7 +62,6 @@ class Platform_Account:
             'fields': 'media_type',
             'access_token': self.accessToken
         }
-
         response = requests.get(endpoint, params=params)
         return response.json()['media_type']
     
@@ -91,8 +90,11 @@ class Platform_Account:
         endpoint = f'https://graph.facebook.com/v20.0/{mediaID}/insights?metric={metrics}&access_token={self.accessToken}'
         
         response = requests.get(endpoint)
-        result = {item['name']: item['values'][0]['value'] for item in (response.json())['data']}
-        print(result)
+        try:
+            result = {item['name']: item['values'][0]['value'] for item in (response.json())['data']}
+        except Exception as e:
+            print(e)
+            return None
         return result
     
     def getMediaSentiment(self,mediaID):
@@ -114,7 +116,6 @@ class Platform_Account:
         response = requests.get(endpoint)
         return response.json()["business_discovery"]["followers_count"]
     
-        
     def getFollowerDemographics(self):
         followersDemographic = {}
         ageEndpoint = f'https://graph.facebook.com/v20.0/{self.platformAccID}/insights?metric=follower_demographics&period=lifetime&metric_type=total_value&breakdown=age&access_token={self.accessToken}'
@@ -140,8 +141,6 @@ class Platform_Account:
         print (followersDemographic)
 
         return followersDemographic
-    
-        
     
     def getDemographics(self,type,timeframe):
         demographic = {}
@@ -180,6 +179,7 @@ def extract_key_value_pairs(data):
                     key_value_pairs[key] = value
     return key_value_pairs
 
+
 def main():
 
     ACCESS_TOKEN = 'EAAenAlDWmIUBOw8If8twNUWZAu1oUT6mxwQrFoMMRrHXoKuYhd6OZCfXL9ZCftV5YisEZBeGebjpneqCjx9FU2XJJ6fGPvc5UDrnXZC9jwmxX2iX4iNZAUbGtZBlpddet0bK3toCWHncyn2HrSCLe0XSIHToyQaYlWvLNSo0ucfP4DHirlVKr2f9whV69QqSRa3'
@@ -188,11 +188,10 @@ def main():
     
     newList = [17963029475773994, 17919006197946852, 17940105560831903, 18150262132315832, 17976896420565504, 18060744193576295, 18012362903177861, 17959705052772586]
     
-    postID = 18012362903177861
+    postID = 18243343168265957
 
     a1 = Platform_Account(APP_ID, ACCESS_TOKEN, USERNAME)
-    a1.getDemographics("this_month")
-
+    print(a1.getMediaInsights(postID, 'VIDEO'))
 
 
 if __name__ == "__main__":

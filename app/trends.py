@@ -1,11 +1,11 @@
  
-from .config import supabase
+from config import supabase
 import json
 from pytrends.request import TrendReq
 import pandas as pd
 from nltk.corpus import wordnet
 
-pytrends  = TrendReq(hl='en-US', tz=360)
+pytrends  = TrendReq(hl='en-US', tz=360, timeout=(10,60), retries=3, backoff_factor=0.1)
 
 def getAccountKW(accountID):
     response = supabase.table('platform_account').select('category').eq('platform_account_id', accountID).execute()
@@ -46,14 +46,14 @@ def getTrends(accountID):
     return 
 
 def main():
-    keyword_list = ["keyboard"]
+    keyword_list = ['gaming']
     # result = getKWtrend(kw_list)
     # print(result.to_string())
     # AccKw = getAccountKW(28736509815)
     # trends = getRelatedTrends(AccKw)
     pytrends.build_payload(keyword_list, cat=0, timeframe= 'today 5-y', geo='', gprop='') 
 
-    trends = getTrendingTopics("united_states")
+    trends = getTrendingTopics("singapore")
     print(trends.to_string())
     relatedTrends = getRelatedTopics()
     print(relatedTrends)
@@ -61,10 +61,11 @@ def main():
 
 if __name__ == "__main__":
 
-    # Get synsets for a word
-    synsets = wordnet.synsets('dog')
+    main()
+    # # Get synsets for a word
+    # synsets = wordnet.synsets('dog')
 
-    # Get definitions and examples
-    for synset in synsets:
-        print(synset.definition())
-        print(synset.examples())
+    # # Get definitions and examples
+    # for synset in synsets:
+    #     print(synset.definition())
+    #     print(synset.examples())
