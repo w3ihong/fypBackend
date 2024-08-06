@@ -1,71 +1,114 @@
  
-from config import supabase
-import json
+from .config import supabase
 from pytrends.request import TrendReq
 import pandas as pd
-from nltk.corpus import wordnet
 
-pytrends  = TrendReq(hl='en-US', tz=360, timeout=(10,60), retries=3, backoff_factor=0.1)
+pytrends  = TrendReq(hl='en-US', tz=360, timeout=(10,60), retries=2, backoff_factor=0.1)
 
 def getAccountKW(accountID):
-    response = supabase.table('platform_account').select('category').eq('platform_account_id', accountID).execute()
-    return response.data[0]['category']
+    response = supabase.table('users').select('main_category','sub_category').eq('user_id', accountID).execute()
+    
+    return response.data[0]['sub_category']
 
-def buildPayload(keyword_list, timeframe = 'today 5-y', geo = '', gprop = ''):
-    pytrends.build_payload(keyword_list, cat=0, timeframe= timeframe, geo=geo, gprop=gprop)
+def buildPayload(keyword_list= [],cat=0, timeframe = 'now 7-d', geo = None, gprop = None):
+    # required for related topics and queries, interest over time, and interest by region
+    # keyword_list: 
+    # timeframe, options: now 1-H, now 4-H, now 1-d, now 7-d, today 1-m, today 3-m, today 12-m or todau 5-y. defaults to now 7-d
+    # geo is a string of the country abbreviation e.g. "US". defaults to (worldwide)
+    # gprop is the google property to filter results options: "images", "news", "youtube". defaults to (web searches)
+    pytrends.build_payload(keyword_list, cat=cat, timeframe= timeframe, geo=geo, gprop=gprop)
 
-def getTrendingTopics(country = "united_states"):
-    # country parameter takes in full country name in snake_case e.g. united_states
-    # default to world if no country is specified
-    return pytrends.trending_searches(pn = country) 
+def getRelatedTopics(keyword_list= [],cat=0, timeframe = 'now 7-d', geo = None, gprop = ''):
+    
+    # requries a payload to be built first
+    buildPayload(keyword_list, cat, timeframe, geo, gprop)
+    try:
+        topics = pytrends.related_topics()
+    except Exception as e:
+        print(e)
+        return False
+    risingTopics = topics[keyword_list[0]]['rising']
+    topTopics = topics[keyword_list[0]]['top']
+    # remove unnecessary columns
+    risingTopicsCleaned = risingTopics.drop(columns=['link', 'topic_mid','topic_type','value'])
+    topTopicsCleaned  = topTopics.drop(columns=['link', 'topic_mid','topic_type','value','hasData'])
+    # convert both into dictionaries and combine them
+    result = {}
+    result['rising'] = risingTopicsCleaned.to_dict(orient='index')
+    result['top'] = topTopicsCleaned.to_dict(orient='index')
 
-def getKWtrend(keyword_list, tf = 'today 5-y' ):
-    #gets the trends of a list of keywords
-    pytrends.build_payload(keyword_list, cat=0, timeframe= tf, geo='', gprop='') 
-    return pytrends.interest_over_time()
+    # result = {}
+    # result['keywords'] = keyword_list
+    # result['timeframe'] = timeframe
+    # result['geo'] = geo
+    return result
 
-def getRelatedTopics():
-    return pytrends.related_topics()
-
-def getRealTimeTrends(country = 'US'):
-    return pytrends.realtime_trending_searches(pn = country)
-
+def getRelatedQueries(keyword_list= [''],cat=0, timeframe = 'now 7-d', geo = None, gprop = ''):
+    # requries a payload to be built first
+    buildPayload(keyword_list, cat, timeframe, geo, gprop)
+    queries = pytrends.related_queries()
+    print(queries)
+    risingQueries = queries[keyword_list[0]]['rising']
+    topQueries = queries[keyword_list[0]]['top']
+    # rearrange the columns
+    risingQueriesRA = risingQueries[['value','query']]
+    topQueriesRA = topQueries[['value','query']]
+    # convert to dictionary and combine 
+    result = {}
+    result['rising'] = risingQueriesRA.to_dict(orient='index')
+    result['top'] = topQueriesRA.to_dict(orient='index')
+    return result
 
 def getKeywordSuggestions(keyword):
     return pytrends.suggestions(keyword)
 
-def getRelatedTrends():
-    #match user's keywords with trends
-    return 
+# # doesnt work after google trends update
+# def getRealTimeTrends(country = 'US'):
+#     # Trending now - real time search trends on google trends
+#     # country parameter takes in abbreviated country name  in CAPS e.g. "US"
+#     # no topic parameter like in the website
+#     try:
+#         result = pytrends.realtime_trending_searches(pn = country)
+#     except KeyError as e:
+#         return "No matching country found"
+#     except Exception as e:
+#         return e
+#     resultDict = result.drop(columns='entityNames').to_dict(orient='index')
+#     cleaned_data = {outer_key: inner_dict[0] for outer_key, inner_dict in resultDict.items()}
+#     return cleaned_data
 
-def getTrends(accountID):
-
-    AccKeyWords = getAccountKW(accountID)
-    relatedTrends = getRelatedTrends(AccKeyWords)
-
-    return 
+def getTrendingTopics(country = "united_states"):
+    # country parameter takes in full country name in snake_case e.g. united_states
+    # default to united_states if no country is specified
+    # no worldwide option
+    # trending now - daily search trends on google trends
+    try:
+        result = pytrends.trending_searches(pn = country)
+    except KeyError as e:
+        return "No matching country found"
+    except Exception as e:
+        return e
+    resultDict = result.to_dict(orient='index')
+    cleaned_data = {outer_key: inner_dict[0] for outer_key, inner_dict in resultDict.items()}
+    return  cleaned_data
 
 def main():
-    keyword_list = ['gaming']
-    # result = getKWtrend(kw_list)
-    # print(result.to_string())
-    # AccKw = getAccountKW(28736509815)
-    # trends = getRelatedTrends(AccKw)
-    pytrends.build_payload(keyword_list, cat=0, timeframe= 'today 5-y', geo='', gprop='') 
-
-    trends = getTrendingTopics("singapore")
-    print(trends.to_string())
-    relatedTrends = getRelatedTopics()
-    print(relatedTrends)
-
+    keyword = ["Olympics"]
+    ACC_ID  ='8b811229-6c65-436b-9c20-5b6abbc0b02d'
+    
+    # AccKw = getAccountKW(ACC_ID)
+    # print(AccKw)
+    
+    # getRelatedTopics(keyword,timeframe='today 1-m')
+    
+    # queries = getRelatedQueries(keyword)
+    # print("queries")
+    # print(queries)
+    trends = getTrendingTopics("united_states")
+    # trends = getRealTimeTrends("US")
+    print(trends)
 
 if __name__ == "__main__":
 
     main()
-    # # Get synsets for a word
-    # synsets = wordnet.synsets('dog')
-
-    # # Get definitions and examples
-    # for synset in synsets:
-    #     print(synset.definition())
-    #     print(synset.examples())
+   

@@ -14,10 +14,10 @@ def getBlobSentiment(sentence):
 
 
 def main():
-    teststrs = ['This is not useful']
+    teststrs = ['🔥🔥🔥🔥🔥', '👏👏']
     for teststr in teststrs:
-        getVaderSentiment(teststr)
-        getBlobSentiment(teststr)
+        vscore  = getVaderSentiment(teststr)
+        print(teststr,vscore)
 
 if __name__ == "__main__":
     main()

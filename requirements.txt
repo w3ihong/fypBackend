@@ -7,3 +7,4 @@ Requests==2.32.3
 supabase==2.5.3
 textblob==0.18.0.post0
 vaderSentiment==3.3.2
+urllib3<2
