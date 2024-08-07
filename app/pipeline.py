@@ -160,6 +160,8 @@ def singleAccountOnboard(id, access_token, username):
 
 def updateDemographics(a1 :Platform_Account):
     followerDemo = a1.getFollowerDemographics()
+    if followerDemo == False:
+        followerDemo = {'age': "More than 100 followers required for demographics data", 'city': '', 'country': '', 'gender': ''}
     try:
         response = supabase.table('follower_demographics').insert([{    
             'platform_account' : a1.platformAccID,

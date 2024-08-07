@@ -1,14 +1,10 @@
  
-from .config import supabase
+
 from pytrends.request import TrendReq
 import pandas as pd
 
 pytrends  = TrendReq(hl='en-US', tz=360, timeout=(10,60), retries=2, backoff_factor=0.1)
 
-def getAccountKW(accountID):
-    response = supabase.table('users').select('main_category','sub_category').eq('user_id', accountID).execute()
-    
-    return response.data[0]['sub_category']
 
 def buildPayload(keyword_list= [],cat=0, timeframe = 'now 7-d', geo = None, gprop = None):
     # required for related topics and queries, interest over time, and interest by region
@@ -99,12 +95,12 @@ def main():
     # AccKw = getAccountKW(ACC_ID)
     # print(AccKw)
     
-    # getRelatedTopics(keyword,timeframe='today 1-m')
+    trends = getRelatedTopics(keyword,timeframe='today 1-m')
     
     # queries = getRelatedQueries(keyword)
     # print("queries")
     # print(queries)
-    trends = getTrendingTopics("united_states")
+    # trends = getTrendingTopics("united_states")
     # trends = getRealTimeTrends("US")
     print(trends)
 

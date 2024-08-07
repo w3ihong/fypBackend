@@ -124,6 +124,8 @@ class Platform_Account:
         countryEndpoint = f'https://graph.facebook.com/v20.0/{self.platformAccID}/insights?metric=follower_demographics&period=lifetime&metric_type=total_value&breakdown=country&access_token={self.accessToken}'
         
         ageResponse = requests.get(ageEndpoint)
+        if 'data' in ageResponse.json():
+            return False
         genderResponse = requests.get(genderEndpoint)
         cityResponse = requests.get(cityEndpoint)
         countryResponse = requests.get(countryEndpoint)
@@ -138,9 +140,8 @@ class Platform_Account:
         followersDemographic['city'] = cityData
         followersDemographic['country'] = countryData
 
-        print (followersDemographic)
-
         return followersDemographic
+        
     
     def getDemographics(self,type,timeframe):
         demographic = {}
@@ -150,6 +151,8 @@ class Platform_Account:
         countryEndpoint = f'https://graph.facebook.com/v20.0/{self.platformAccID}/insights?metric={type}_audience_demographics&timeframe={timeframe}&period=lifetime&metric_type=total_value&breakdown=country&access_token={self.accessToken}'
         
         ageResponse = requests.get(ageEndpoint)
+        if 'data' not in ageResponse.json():
+            return ageResponse.json()
         genderResponse = requests.get(genderEndpoint)
         cityResponse = requests.get(cityEndpoint)
         countryResponse = requests.get(countryEndpoint)
@@ -164,9 +167,8 @@ class Platform_Account:
         demographic['city'] = cityData
         demographic['country'] = countryData
 
-        print (demographic)
-
         return demographic
+        
     
 def extract_key_value_pairs(data):
     key_value_pairs = {}

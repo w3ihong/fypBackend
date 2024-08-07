@@ -24,14 +24,14 @@ api end point : https://fyp-ml-ejbkojtuia-ts.a.run.app
     - fields
         - {country}   : full country name in lowercase and under scores (e.g united_states, singapore)
 
-- /related_topics/{keyword}
+- /related_topics/{keyword}?timeframe={timeframe}&geo={geo}
     - retrives trending topics related to a given keyword
     - fields
         - {keyword}   : keyword in string, no specific format
         - {timeframe} : can be now 1-H, now 4-H, now 1-d, now 7-d, today 1-m, today 3-m, today 12-m or todau 5-y. defaults to now 7-d
         - {geo}       : string of the country abbreviation e.g. "US", "IN". defaults to (worldwide)
 
-- /related_queries/{keyword}
+- /related_queries/{keyword}?timeframe={timeframe}&geo={geo}
     - rtrieves trendgin queries realted to a given keyword
     - same fields as topics
 
