@@ -22,7 +22,7 @@ def getRelatedTopics(keyword_list= [],cat=0, timeframe = 'now 7-d', geo = None, 
         topics = pytrends.related_topics()
     except Exception as e:
         print(e)
-        return False
+        return {"error": "Query failed"}
     print(topics)
     risingTopics = topics[keyword_list[0]]['rising']
     topTopics = topics[keyword_list[0]]['top']
@@ -31,7 +31,7 @@ def getRelatedTopics(keyword_list= [],cat=0, timeframe = 'now 7-d', geo = None, 
         risingTopicsCleaned = risingTopics.drop(columns=['link', 'topic_mid','topic_type','value'])
         topTopicsCleaned  = topTopics.drop(columns=['link', 'topic_mid','topic_type','value','hasData'])
     except KeyError as e:
-        return "Insufficient data"
+        return {"error": "Insufficient data"}
     # convert both into dictionaries and combine them
     result = {}
     result['rising'] = risingTopicsCleaned.to_dict(orient='index')
@@ -50,7 +50,7 @@ def getRelatedQueries(keyword_list= [''],cat=0, timeframe = 'now 7-d', geo = Non
         queries = pytrends.related_queries()
     except Exception as e:
         print(e)
-        return False
+        return {"error": "Query failed"}
     risingQueries = queries[keyword_list[0]]['rising']
     topQueries = queries[keyword_list[0]]['top']
     # rearrange the columns
@@ -58,7 +58,7 @@ def getRelatedQueries(keyword_list= [''],cat=0, timeframe = 'now 7-d', geo = Non
         risingQueriesRA = risingQueries[['value','query']]
         topQueriesRA = topQueries[['value','query']]
     except KeyError as e:
-        return "Insufficient data"
+        return {"error": "Insufficient data"}
     # convert to dictionary and combine 
     result = {}
     result['rising'] = risingQueriesRA.to_dict(orient='index')
