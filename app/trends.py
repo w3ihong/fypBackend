@@ -23,11 +23,15 @@ def getRelatedTopics(keyword_list= [],cat=0, timeframe = 'now 7-d', geo = None, 
     except Exception as e:
         print(e)
         return False
+    print(topics)
     risingTopics = topics[keyword_list[0]]['rising']
     topTopics = topics[keyword_list[0]]['top']
     # remove unnecessary columns
-    risingTopicsCleaned = risingTopics.drop(columns=['link', 'topic_mid','topic_type','value'])
-    topTopicsCleaned  = topTopics.drop(columns=['link', 'topic_mid','topic_type','value','hasData'])
+    try:
+        risingTopicsCleaned = risingTopics.drop(columns=['link', 'topic_mid','topic_type','value'])
+        topTopicsCleaned  = topTopics.drop(columns=['link', 'topic_mid','topic_type','value','hasData'])
+    except KeyError as e:
+        return "Insufficient data"
     # convert both into dictionaries and combine them
     result = {}
     result['rising'] = risingTopicsCleaned.to_dict(orient='index')
@@ -50,8 +54,11 @@ def getRelatedQueries(keyword_list= [''],cat=0, timeframe = 'now 7-d', geo = Non
     risingQueries = queries[keyword_list[0]]['rising']
     topQueries = queries[keyword_list[0]]['top']
     # rearrange the columns
-    risingQueriesRA = risingQueries[['value','query']]
-    topQueriesRA = topQueries[['value','query']]
+    try:
+        risingQueriesRA = risingQueries[['value','query']]
+        topQueriesRA = topQueries[['value','query']]
+    except KeyError as e:
+        return "Insufficient data"
     # convert to dictionary and combine 
     result = {}
     result['rising'] = risingQueriesRA.to_dict(orient='index')
@@ -92,13 +99,13 @@ def getTrendingTopics(country = "united_states"):
     return  cleaned_data
 
 def main():
-    keyword = ["Olympics"]
-    ACC_ID  ='8b811229-6c65-436b-9c20-5b6abbc0b02d'
+    keyword = ["hsbaskf"]
+    
     
     # AccKw = getAccountKW(ACC_ID)
     # print(AccKw)
     
-    trends = getRelatedTopics(keyword,timeframe='today 1-m')
+    trends = getRelatedTopics(keyword,timeframe='today 1-m',)
     
     # queries = getRelatedQueries(keyword)
     # print("queries")
