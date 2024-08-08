@@ -42,8 +42,11 @@ def getRelatedTopics(keyword_list= [],cat=0, timeframe = 'now 7-d', geo = None, 
 def getRelatedQueries(keyword_list= [''],cat=0, timeframe = 'now 7-d', geo = None, gprop = ''):
     # requries a payload to be built first
     buildPayload(keyword_list, cat, timeframe, geo, gprop)
-    queries = pytrends.related_queries()
-    print(queries)
+    try:
+        queries = pytrends.related_queries()
+    except Exception as e:
+        print(e)
+        return False
     risingQueries = queries[keyword_list[0]]['rising']
     topQueries = queries[keyword_list[0]]['top']
     # rearrange the columns
