@@ -124,7 +124,7 @@ class Platform_Account:
         countryEndpoint = f'https://graph.facebook.com/v20.0/{self.platformAccID}/insights?metric=follower_demographics&period=lifetime&metric_type=total_value&breakdown=country&access_token={self.accessToken}'
         
         ageResponse = requests.get(ageEndpoint)
-        if 'data' in ageResponse.json():
+        if 'data' not in ageResponse.json():
             return False
         genderResponse = requests.get(genderEndpoint)
         cityResponse = requests.get(cityEndpoint)
