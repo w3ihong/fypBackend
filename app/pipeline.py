@@ -66,7 +66,6 @@ def updatePostsTable(self : Platform_Account) -> list:
 
 def updatePostMetrics(post,a1: Platform_Account, mediaType, followers):
 
-    print("post: ", post , " mediaType: ", mediaType)
     insights = a1.getMediaInsights(post, mediaType)
     if insights == None:
         print("Failed to get insights for: ", post)
@@ -96,11 +95,12 @@ def updatePostMetrics(post,a1: Platform_Account, mediaType, followers):
         return False
     
     fullMetrics = {"id": post , "likes":insights["likes"], "shares": insights['shares'], "saved": insights["saved"], "comments": insights["comments"], "impressions": insights["impressions"], "reach" : insights["reach"], "profile_visits" : insights['profile_visits'] if mediaType != 'VIDEO' else 0, "sentiment" : sentimentScore, "video_views" : insights['video_views'], "amplification_rate":insights['shares']/followers }
-
+    print("Shares:", insights['shares'])
     return True, fullMetrics
 
 def updateAccountMetrics(metrics, postCount, a1: Platform_Account):
     metrics["sentiment"] = metrics["sentiment"]/postCount
+    print("Account metrics: ", metrics)
     try:
         response = supabase.table('platform_metrics').insert([{
             'platform_account' : a1.platformAccID,
@@ -204,6 +204,7 @@ def main():
                 accountMetrics['video_views'] += fullPostMetrics['video_views']
 
                 postUpdateSuccess += 1
+                print("account shares : ", accountMetrics['shares'])
 
         print("Post update Success: ", postUpdateSuccess, "/", len(mediaList))
 
