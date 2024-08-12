@@ -1,7 +1,7 @@
-# from .config import supabase
-# from .account import Platform_Account
-from config import supabase
-from account import Platform_Account
+from .config import supabase
+from .account import Platform_Account
+# from config import supabase
+# from account import Platform_Account
 
 
 def updatePostsTable(self : Platform_Account) -> list:

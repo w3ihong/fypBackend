@@ -1,5 +1,4 @@
  
-
 from pytrends.request import TrendReq
 import pandas as pd
 
@@ -19,8 +18,7 @@ def getRelatedTopics(keyword_list= [],cat=0, timeframe = 'now 7-d', geo = None, 
     # requries a payload to be built first
     buildPayload(keyword_list, cat, timeframe, geo, gprop)
     try:
-        topics = pytrends.related_topics()
-        print(topics)   
+        topics = pytrends.related_topics()  
     except Exception as e:
         print(e)
         return {"error": "Query failed"}
@@ -50,7 +48,6 @@ def getRelatedQueries(keyword_list= [''],cat=0, timeframe = 'now 7-d', geo = Non
     buildPayload(keyword_list, cat, timeframe, geo, gprop)
     try:
         queries = pytrends.related_queries()
-        print(queries)
     except Exception as e:
         print(e)
         return {"error": "Query failed"}

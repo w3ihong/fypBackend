@@ -1,9 +1,9 @@
 import json
 import requests
-# from .sentiment import getBlobSentiment as getSentiment
-# from .config import supabase
-from sentiment import getVaderSentiment as getSentiment
-from config import supabase
+from .sentiment import getBlobSentiment as getSentiment
+from .config import supabase
+# from sentiment import getVaderSentiment as getSentiment
+# from config import supabase
 
 class Platform_Account:
 
