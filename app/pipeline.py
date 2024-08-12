@@ -1,7 +1,7 @@
-from .config import supabase
-from .account import Platform_Account
-# from config import supabase
-# from account import Platform_Account
+# from .config import supabase
+# from .account import Platform_Account
+from config import supabase
+from account import Platform_Account
 
 
 def updatePostsTable(self : Platform_Account) -> list:
@@ -88,6 +88,7 @@ def updatePostMetrics(post,a1: Platform_Account, mediaType, followers):
             'post_video_views': insights['video_views'],
             'post_amplification_rate' : insights['shares']/followers
         }]).execute()
+        print(response)
         print("SUCCESS for : ", post)
     except Exception as e:
         print("Failed stroe data  for : ", post)
@@ -232,4 +233,4 @@ if __name__ == "__main__":
     USERNAME = 'echosphere.sg'
 
     a1 = Platform_Account(APP_ID,ACCESS_TOKEN,USERNAME)
-    updateDemographics(a1)
+    updatePostMetrics('18024137249095516',a1,'CAROUSEL_ALBUM', 108)

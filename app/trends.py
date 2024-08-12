@@ -20,10 +20,10 @@ def getRelatedTopics(keyword_list= [],cat=0, timeframe = 'now 7-d', geo = None, 
     buildPayload(keyword_list, cat, timeframe, geo, gprop)
     try:
         topics = pytrends.related_topics()
+        print(topics)   
     except Exception as e:
         print(e)
         return {"error": "Query failed"}
-    print(topics)
     risingTopics = topics[keyword_list[0]]['rising']
     topTopics = topics[keyword_list[0]]['top']
     # remove unnecessary columns
@@ -31,6 +31,8 @@ def getRelatedTopics(keyword_list= [],cat=0, timeframe = 'now 7-d', geo = None, 
         risingTopicsCleaned = risingTopics.drop(columns=['link', 'topic_mid','topic_type','value'])
         topTopicsCleaned  = topTopics.drop(columns=['link', 'topic_mid','topic_type','value','hasData'])
     except KeyError as e:
+        return {"error": "Insufficient data"}
+    except TypeError as e:
         return {"error": "Insufficient data"}
     # convert both into dictionaries and combine them
     result = {}
@@ -48,16 +50,21 @@ def getRelatedQueries(keyword_list= [''],cat=0, timeframe = 'now 7-d', geo = Non
     buildPayload(keyword_list, cat, timeframe, geo, gprop)
     try:
         queries = pytrends.related_queries()
+        print(queries)
     except Exception as e:
         print(e)
         return {"error": "Query failed"}
     risingQueries = queries[keyword_list[0]]['rising']
     topQueries = queries[keyword_list[0]]['top']
+
     # rearrange the columns
     try:
         risingQueriesRA = risingQueries[['value','query']]
         topQueriesRA = topQueries[['value','query']]
+
     except KeyError as e:
+        return {"error": "Insufficient data"}
+    except TypeError as e:
         return {"error": "Insufficient data"}
     # convert to dictionary and combine 
     result = {}
@@ -99,13 +106,13 @@ def getTrendingTopics(country = "united_states"):
     return  cleaned_data
 
 def main():
-    keyword = ["hsbaskf"]
+    keyword = ["water bottle"]
     
     
     # AccKw = getAccountKW(ACC_ID)
     # print(AccKw)
     
-    trends = getRelatedTopics(keyword,timeframe='today 1-m',)
+    trends = getRelatedQueries(keyword,timeframe='today 1-m', geo='IT')
     
     # queries = getRelatedQueries(keyword)
     # print("queries")

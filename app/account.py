@@ -1,9 +1,9 @@
 import json
 import requests
-from .sentiment import getBlobSentiment as getSentiment
-from .config import supabase
-# from sentiment import getVaderSentiment as getSentiment
-# from config import supabase
+# from .sentiment import getBlobSentiment as getSentiment
+# from .config import supabase
+from sentiment import getVaderSentiment as getSentiment
+from config import supabase
 
 class Platform_Account:
 
@@ -190,7 +190,7 @@ def main():
     
     newList = [17963029475773994, 17919006197946852, 17940105560831903, 18150262132315832, 17976896420565504, 18060744193576295, 18012362903177861, 17959705052772586]
     
-    postID = 18243343168265957
+    postID = 18024137249095516
 
     a1 = Platform_Account(APP_ID, ACCESS_TOKEN, USERNAME)
     print(a1.getMediaInsights(postID, 'VIDEO'))
