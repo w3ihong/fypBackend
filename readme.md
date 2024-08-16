@@ -51,23 +51,7 @@ api end point : https://fyp-ml-ejbkojtuia-ts.a.run.app
 
 
 - trends
-    - can be done in js
-    - for platform hashtags and google trends
-    - no way to query popular hastags straight from meta api
-    - flow 
-        - fetch trends from google trends
-        - match trends with users interest 
-        - find suitable hashtags
+    - a custom proxy endpoint that utilizes the unofficial pytrends library, to get trending data from google trends, applying custom data manipulation and custom foramatting for our web app
             
-
-## TODO ##
-- better nlp model for sentiment (emojis)
-- hosting and automating pipeline
-
-useful links 
-Google Trends : https://pypi.org/project/pytrends/ 
-Pytrends Repo : https://github.com/GeneralMills/pytrends/blob/master/examples/example.py
-
-ConceptNet: https://github.com/commonsense/conceptnet5/wiki/API
-
-security = https://developers.facebook.com/docs/facebook-login/security/#https
+- demographics 
+    - custom end point to simplify the process of fetching reacehed and engaged demographcis from meta's api 
