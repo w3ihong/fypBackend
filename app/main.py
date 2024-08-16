@@ -15,7 +15,7 @@ from .trends import getRelatedQueries
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost","http://localhost:8000","http://localhost:3000", "https://fyp-flame.vercel.app"],  # Frontend URL
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
