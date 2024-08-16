@@ -193,7 +193,9 @@ def main():
     postID = 18024137249095516
 
     a1 = Platform_Account(APP_ID, ACCESS_TOKEN, USERNAME)
-    print(a1.getMediaInsights(postID, 'VIDEO'))
+    
+    demo = a1.getDemographics('engaged','this_month')
+    print(demo)
 
 
 if __name__ == "__main__":

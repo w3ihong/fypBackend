@@ -22,26 +22,8 @@ def getRelatedTopics(keyword_list= [],cat=0, timeframe = 'now 7-d', geo = None, 
     except Exception as e:
         print(e)
         return {"error": "Query failed"}
-    risingTopics = topics[keyword_list[0]]['rising']
-    topTopics = topics[keyword_list[0]]['top']
-    # remove unnecessary columns
-    try:
-        risingTopicsCleaned = risingTopics.drop(columns=['link', 'topic_mid','topic_type','value'])
-        topTopicsCleaned  = topTopics.drop(columns=['link', 'topic_mid','topic_type','value','hasData'])
-    except KeyError as e:
-        return {"error": "Insufficient data"}
-    except TypeError as e:
-        return {"error": "Insufficient data"}
-    # convert both into dictionaries and combine them
-    result = {}
-    result['rising'] = risingTopicsCleaned.to_dict(orient='index')
-    result['top'] = topTopicsCleaned.to_dict(orient='index')
-
-    # result = {}
-    # result['keywords'] = keyword_list
-    # result['timeframe'] = timeframe
-    # result['geo'] = geo
-    return result
+    
+    return process_trends_data(topics, keyword_list)
 
 def getRelatedQueries(keyword_list= [''],cat=0, timeframe = 'now 7-d', geo = None, gprop = ''):
     # requries a payload to be built first
@@ -51,41 +33,12 @@ def getRelatedQueries(keyword_list= [''],cat=0, timeframe = 'now 7-d', geo = Non
     except Exception as e:
         print(e)
         return {"error": "Query failed"}
-    risingQueries = queries[keyword_list[0]]['rising']
-    topQueries = queries[keyword_list[0]]['top']
+    
+    return process_trends_data(queries, keyword_list)
 
-    # rearrange the columns
-    try:
-        risingQueriesRA = risingQueries[['value','query']]
-        topQueriesRA = topQueries[['value','query']]
+ 
 
-    except KeyError as e:
-        return {"error": "Insufficient data"}
-    except TypeError as e:
-        return {"error": "Insufficient data"}
-    # convert to dictionary and combine 
-    result = {}
-    result['rising'] = risingQueriesRA.to_dict(orient='index')
-    result['top'] = topQueriesRA.to_dict(orient='index')
-    return result
 
-def getKeywordSuggestions(keyword):
-    return pytrends.suggestions(keyword)
-
-# # doesnt work after google trends update
-# def getRealTimeTrends(country = 'US'):
-#     # Trending now - real time search trends on google trends
-#     # country parameter takes in abbreviated country name  in CAPS e.g. "US"
-#     # no topic parameter like in the website
-#     try:
-#         result = pytrends.realtime_trending_searches(pn = country)
-#     except KeyError as e:
-#         return "No matching country found"
-#     except Exception as e:
-#         return e
-#     resultDict = result.drop(columns='entityNames').to_dict(orient='index')
-#     cleaned_data = {outer_key: inner_dict[0] for outer_key, inner_dict in resultDict.items()}
-#     return cleaned_data
 
 def getTrendingTopics(country = "united_states"):
     # country parameter takes in full country name in snake_case e.g. united_states
@@ -102,14 +55,51 @@ def getTrendingTopics(country = "united_states"):
     cleaned_data = {outer_key: inner_dict[0] for outer_key, inner_dict in resultDict.items()}
     return  cleaned_data
 
+def process_trends_data(data, keyword_list):
+    # Extracting the DataFrames
+    rising_df = data[keyword_list[0]]['rising']
+    
+    top_df = data[keyword_list[0]]['top']
+
+    result = {}
+    
+    # Check if the rising DataFrame is empty
+    if rising_df.empty:
+        result['rising'] = {
+            0: {
+                'formattedValue': 'N/A',
+                'topic_title': 'Insufficient data'
+            }
+        }
+    else:
+        # Clean the rising DataFrame and convert it to a dictionary
+        rising_cleaned = rising_df.drop(columns=['link', 'topic_mid', 'topic_type', 'value'])
+        result['rising'] = rising_cleaned.to_dict(orient='index')
+
+    # Check if the top DataFrame is empty
+    if top_df.empty:
+        result['top'] = {
+            0: {
+                'formattedValue': 'N/A',
+                'topic_title': 'Insufficient data'
+            }
+        }
+    else:
+        # Clean the top DataFrame and convert it to a dictionary
+        top_cleaned = top_df.drop(columns=['link', 'topic_mid', 'topic_type', 'value', 'hasData'])
+        result['top'] = top_cleaned.to_dict(orient='index')
+    
+    return result
+
+
 def main():
-    keyword = ["water bottle"]
+    keyword = ["apple"]
     
     
     # AccKw = getAccountKW(ACC_ID)
     # print(AccKw)
     
-    trends = getRelatedQueries(keyword,timeframe='today 1-m', geo='IT')
+    trends = getRelatedTopics(keyword,timeframe='now 1-d')
     
     # queries = getRelatedQueries(keyword)
     # print("queries")

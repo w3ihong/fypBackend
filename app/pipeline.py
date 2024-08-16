@@ -88,7 +88,6 @@ def updatePostMetrics(post,a1: Platform_Account, mediaType, followers):
             'post_video_views': insights['video_views'],
             'post_amplification_rate' : insights['shares']/followers
         }]).execute()
-        print(response)
         print("SUCCESS for : ", post)
     except Exception as e:
         print("Failed stroe data  for : ", post)
@@ -96,7 +95,7 @@ def updatePostMetrics(post,a1: Platform_Account, mediaType, followers):
         return False
     
     fullMetrics = {"id": post , "likes":insights["likes"], "shares": insights['shares'], "saved": insights["saved"], "comments": insights["comments"], "impressions": insights["impressions"], "reach" : insights["reach"], "profile_visits" : insights['profile_visits'] if mediaType != 'VIDEO' else 0, "sentiment" : sentimentScore, "video_views" : insights['video_views'], "amplification_rate":insights['shares']/followers }
-    print("Shares:", insights['shares'])
+    
     return True, fullMetrics
 
 def updateAccountMetrics(metrics, postCount, a1: Platform_Account):
