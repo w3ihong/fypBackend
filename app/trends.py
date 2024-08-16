@@ -13,7 +13,7 @@ def buildPayload(keyword_list= [],cat=0, timeframe = 'now 7-d', geo = None, gpro
     # gprop is the google property to filter results options: "images", "news", "youtube". defaults to (web searches)
     pytrends.build_payload(keyword_list, cat=cat, timeframe= timeframe, geo=geo, gprop=gprop)
 
-def getRelatedTopics(keyword_list= [],cat=0, timeframe = 'now 7-d', geo = None, gprop = ''):
+def getRelatedTopics(keyword_list= [''],cat=0, timeframe = 'now 7-d', geo = None, gprop = ''):
     
     # requries a payload to be built first
     buildPayload(keyword_list, cat, timeframe, geo, gprop)
@@ -33,11 +33,41 @@ def getRelatedQueries(keyword_list= [''],cat=0, timeframe = 'now 7-d', geo = Non
     except Exception as e:
         print(e)
         return {"error": "Query failed"}
-    
-    return process_trends_data(queries, keyword_list)
+    risingQueries = queries[keyword_list[0]]['rising']
+    topQueries = queries[keyword_list[0]]['top']
+    # rearrange the columns
+    result = {}
+    if risingQueries.empty and topQueries.empty:
+        return {"error": "Insufficient data"}
 
- 
+    try:
+        
+        # Ensure risingQueries and topQueries contain data
+        if risingQueries.empty:
+            risingQueriesRA = pd.DataFrame({
+                'value': [0],
+                'query': ['Insufficient data']
+            })
+        else:
+            risingQueriesRA = risingQueries[['value', 'query']]
 
+        if topQueries.empty:
+            topQueriesRA = pd.DataFrame({
+                'value': [0],
+                'query': ['Insufficient data']
+            })
+        else:
+            topQueriesRA = topQueries[['value', 'query']]
+
+
+    except KeyError as e:
+        return {"error": "Insufficient data"}
+    except TypeError as e:
+        return {"error": "Insufficient data"}
+    # convert to dictionary and combine
+    result['rising'] = risingQueriesRA.to_dict(orient='index')
+    result['top'] = topQueriesRA.to_dict(orient='index')
+    return result
 
 
 def getTrendingTopics(country = "united_states"):
@@ -99,7 +129,7 @@ def main():
     # AccKw = getAccountKW(ACC_ID)
     # print(AccKw)
     
-    trends = getRelatedTopics(keyword,timeframe='now 1-d')
+    trends = getRelatedQueries(keyword,timeframe='today 3-m')
     
     # queries = getRelatedQueries(keyword)
     # print("queries")

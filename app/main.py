@@ -61,7 +61,9 @@ def retrieve_related_topics(
     timeframe: Optional[str] = 'now 7-d',
     geo: Optional[str] = None
 ):  
-    
+    print("Keyword: ", keyword)
+    print("Timeframe: ", timeframe)
+    print("Geo: ", geo)
     return getRelatedTopics(keyword_list=[keyword], timeframe=timeframe, geo=geo)
 
 @app.get("/related_queries/{keyword}")
@@ -70,5 +72,10 @@ def retrieve_related_queries(
     timeframe: Optional[str] = 'now 7-d',
     geo: Optional[str] = None
 ):  
-    
+    print("Keyword: ", keyword)
+    print("Timeframe: ", timeframe)
+    print("Geo: ", geo)
     return getRelatedQueries(keyword_list=[keyword],timeframe=timeframe,geo=geo)
+
+
+    
