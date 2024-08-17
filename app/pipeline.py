@@ -3,7 +3,6 @@ from .account import Platform_Account
 # from config import supabase
 # from account import Platform_Account
 
-
 def updatePostsTable(self : Platform_Account) -> list:
 
     # get existing posts from posts table
@@ -94,7 +93,7 @@ def updatePostMetrics(post,a1: Platform_Account, mediaType, followers):
         print(e)
         return False, {}
     
-    fullMetrics = {"id": post , "likes":insights["likes"], "shares": insights['shares'], "saved": insights["saved"], "comments": insights["comments"], "impressions": insights["impressions"], "reach" : insights["reach"], "profile_visits" : insights['profile_visits'] if mediaType != 'VIDEO' else 0, "sentiment" : sentimentScore, "video_views" : insights['video_views'], "amplification_rate":insights['shares']/followers }
+    fullMetrics = {"id": post , "likes":insights["likes"], "shares": insights['shares'], "saved": insights["saved"], "comments": insights["comments"], "impressions": insights["impressions"]if mediaType != 'VIDEO' else insights['video_views'], "reach" : insights["reach"], "profile_visits" : insights['profile_visits'] if mediaType != 'VIDEO' else 0, "sentiment" : sentimentScore, "video_views" : insights['video_views'], "amplification_rate":insights['shares']/followers }
     
     return True, fullMetrics
 
