@@ -4,6 +4,20 @@ import pandas as pd
 
 pytrends  = TrendReq(hl='en-US', tz=360, timeout=(10,60), retries=2, backoff_factor=0.1)
 
+def getTrendingTopics(country = "united_states"):
+    # country parameter takes in full country name in snake_case e.g. united_states
+    # default to united_states if no country is specified
+    # no worldwide option
+    # trending now - daily search trends on google trends
+    try:
+        result = pytrends.trending_searches(pn = country)
+    except KeyError as e:
+        return "No matching country found"
+    except Exception as e:
+        return e
+    resultDict = result.to_dict(orient='index')
+    cleaned_data = {outer_key: inner_dict[0] for outer_key, inner_dict in resultDict.items()}
+    return  cleaned_data
 
 def buildPayload(keyword_list= [],cat=0, timeframe = 'now 7-d', geo = None, gprop = None):
     # required for related topics and queries, interest over time, and interest by region
@@ -13,17 +27,6 @@ def buildPayload(keyword_list= [],cat=0, timeframe = 'now 7-d', geo = None, gpro
     # gprop is the google property to filter results options: "images", "news", "youtube". defaults to (web searches)
     pytrends.build_payload(keyword_list, cat=cat, timeframe= timeframe, geo=geo, gprop=gprop)
 
-def getRelatedTopics(keyword_list= [''],cat=0, timeframe = 'now 7-d', geo = None, gprop = ''):
-    
-    # requries a payload to be built first
-    buildPayload(keyword_list, cat, timeframe, geo, gprop)
-    try:
-        topics = pytrends.related_topics()  
-    except Exception as e:
-        print(e)
-        return {"error": "Query failed"}
-    
-    return process_trends_data(topics, keyword_list)
 
 def getRelatedQueries(keyword_list= [''],cat=0, timeframe = 'now 7-d', geo = None, gprop = ''):
     # requries a payload to be built first
@@ -70,26 +73,21 @@ def getRelatedQueries(keyword_list= [''],cat=0, timeframe = 'now 7-d', geo = Non
     return result
 
 
-def getTrendingTopics(country = "united_states"):
-    # country parameter takes in full country name in snake_case e.g. united_states
-    # default to united_states if no country is specified
-    # no worldwide option
-    # trending now - daily search trends on google trends
-    try:
-        result = pytrends.trending_searches(pn = country)
-    except KeyError as e:
-        return "No matching country found"
-    except Exception as e:
-        return e
-    resultDict = result.to_dict(orient='index')
-    cleaned_data = {outer_key: inner_dict[0] for outer_key, inner_dict in resultDict.items()}
-    return  cleaned_data
 
-def process_trends_data(data, keyword_list):
-    # Extracting the DataFrames
-    rising_df = data[keyword_list[0]]['rising']
+def getRelatedTopics(keyword_list= [''],cat=0, timeframe = 'now 7-d', geo = None, gprop = ''):
     
-    top_df = data[keyword_list[0]]['top']
+    # requries a payload to be built first
+    buildPayload(keyword_list, cat, timeframe, geo, gprop)
+    try:
+        topics = pytrends.related_topics()  
+    except Exception as e:
+        print(e)
+        return {"error": "Query failed"}
+    
+    # Extracting the DataFrames
+    rising_df = topics[keyword_list[0]]['rising']
+    
+    top_df = topics[keyword_list[0]]['top']
 
     result = {}
     
@@ -97,8 +95,8 @@ def process_trends_data(data, keyword_list):
     if rising_df.empty:
         result['rising'] = {
             0: {
-                'formattedValue': 'N/A',
-                'topic_title': 'Insufficient data'
+                'value': 'N/A',
+                'query': 'Insufficient data'
             }
         }
     else:
@@ -110,8 +108,8 @@ def process_trends_data(data, keyword_list):
     if top_df.empty:
         result['top'] = {
             0: {
-                'formattedValue': 'N/A',
-                'topic_title': 'Insufficient data'
+                'value': 'N/A',
+                'query': 'Insufficient data'
             }
         }
     else:
@@ -129,7 +127,7 @@ def main():
     # AccKw = getAccountKW(ACC_ID)
     # print(AccKw)
     
-    trends = getRelatedQueries(keyword,timeframe='today 3-m')
+    trends = getRelatedTopics(keyword,timeframe='now 1-d')
     
     # queries = getRelatedQueries(keyword)
     # print("queries")

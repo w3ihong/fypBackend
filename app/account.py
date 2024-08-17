@@ -83,7 +83,7 @@ class Platform_Account:
 
     def getMediaInsights(self,mediaID, mediaType):
         if mediaType == 'VIDEO':
-            metrics = 'likes,shares,saved,comments,impressions,reach,video_views,total_interactions'
+            metrics = 'likes,shares,saved,comments,reach,video_views,total_interactions'
         else :
             metrics = 'likes,shares,saved,comments,impressions,reach,profile_visits,video_views,total_interactions'
         
@@ -93,6 +93,7 @@ class Platform_Account:
         try:
             result = {item['name']: item['values'][0]['value'] for item in (response.json())['data']}
         except Exception as e:
+            print(response.json())
             print(e)
             return None
         return result
@@ -188,15 +189,13 @@ def main():
     APP_ID = '17841466917978018'
     USERNAME = 'echosphere.sg'
     
-    newList = [17963029475773994, 17919006197946852, 17940105560831903, 18150262132315832, 17976896420565504, 18060744193576295, 18012362903177861, 17959705052772586]
     
-    postID = 18024137249095516
+    postID = 18243343168265957
 
     a1 = Platform_Account(APP_ID, ACCESS_TOKEN, USERNAME)
     
-    demo = a1.getDemographics('engaged','this_month')
-    print(demo)
-
+    insights =  a1.getMediaInsights(postID, 'VIDEO')
+    print(insights)
 
 if __name__ == "__main__":
     main()

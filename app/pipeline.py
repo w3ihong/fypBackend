@@ -69,7 +69,7 @@ def updatePostMetrics(post,a1: Platform_Account, mediaType, followers):
     insights = a1.getMediaInsights(post, mediaType)
     if insights == None:
         print("Failed to get insights for: ", post)
-        return False
+        return False , {}
     if insights['comments'] != 0:
         sentimentScore = a1.getMediaSentiment(post)
     else:
@@ -81,7 +81,7 @@ def updatePostMetrics(post,a1: Platform_Account, mediaType, followers):
             'post_shares': insights['shares'],
             'post_saved': insights['saved'],
             'post_comments': insights['comments'],
-            'post_impressions': insights['impressions'],
+            'post_impressions': insights['impressions'] if mediaType != 'VIDEO' else insights['video_views'],
             'post_reach': insights['reach'],
             'post_profile_visits': insights['profile_visits'] if mediaType != 'VIDEO' else 0,
             'post_sentiment': sentimentScore,
@@ -90,9 +90,9 @@ def updatePostMetrics(post,a1: Platform_Account, mediaType, followers):
         }]).execute()
         print("SUCCESS for : ", post)
     except Exception as e:
-        print("Failed stroe data  for : ", post)
+        print("Failed store data  for : ", post)
         print(e)
-        return False
+        return False, {}
     
     fullMetrics = {"id": post , "likes":insights["likes"], "shares": insights['shares'], "saved": insights["saved"], "comments": insights["comments"], "impressions": insights["impressions"], "reach" : insights["reach"], "profile_visits" : insights['profile_visits'] if mediaType != 'VIDEO' else 0, "sentiment" : sentimentScore, "video_views" : insights['video_views'], "amplification_rate":insights['shares']/followers }
     
@@ -198,13 +198,12 @@ def main():
                 accountMetrics['shares'] += fullPostMetrics['shares']
                 accountMetrics['saved'] += fullPostMetrics['saved']
                 accountMetrics['comments'] += fullPostMetrics['comments']
-                accountMetrics['impressions'] += fullPostMetrics['impressions']
+                accountMetrics['impressions'] += fullPostMetrics['impressions'] if type != 'VIDEO' else fullPostMetrics['video_views']
                 accountMetrics['profile_visits'] += fullPostMetrics['profile_visits']
                 accountMetrics['sentiment'] += fullPostMetrics['sentiment']
                 accountMetrics['video_views'] += fullPostMetrics['video_views']
 
                 postUpdateSuccess += 1
-                print("account shares : ", accountMetrics['shares'])
 
         print("Post update Success: ", postUpdateSuccess, "/", len(mediaList))
 
